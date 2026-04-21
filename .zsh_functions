@@ -1,0 +1,45 @@
+# Dev Port Utilities
+
+function portsls() {
+  echo "🔍 Scanning dev ports...\n"
+  for port in "${DEV_PORTS[@]}"; do
+    local pids
+    pids=$(lsof -t -i :"$port" -sTCP:LISTEN 2>/dev/null)
+    if [ -n "$pids" ]; then
+      echo "⚡ PORT $port — IN USE"
+      lsof -i :"$port" -sTCP:LISTEN | awk 'NR==1 || NR>1' | grep -v "^COMMAND" | \
+        awk '{printf "   %-8s PID:%-6s %s\n", $1, $2, $9}'
+    else
+      echo "✅ PORT $port — free"
+    fi
+  done
+}
+
+function portskill() {
+  echo "💀 Killing dev ports...\n"
+  for port in "${DEV_PORTS[@]}"; do
+    local pids
+    pids=$(lsof -t -i :"$port" -sTCP:LISTEN 2>/dev/null)
+    if [ -n "$pids" ]; then
+      echo "$pids" | xargs kill -9
+      echo "🔥 Killed port $port (PID: $pids)"
+    else
+      echo "✅ Port $port already free"
+    fi
+  done
+}
+
+
+# Git: Worktree
+
+# Usage: wtrm <worktree-path> <branch-name>
+function wtrm() {
+  if [[ -z "$1" || -z "$2" ]]; then
+    echo "Usage: wtrm <worktree-path> <branch-name>"
+    return 1
+  fi
+  git worktree remove --force "$1" && \
+  git worktree prune && \
+  git branch -D "$2" && \
+  echo "✅ Worktree and branch '$2' removed."
+}

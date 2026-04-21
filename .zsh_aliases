@@ -1,0 +1,36 @@
+# System
+alias grep='grep --color=auto'
+alias l='ls -CF'
+alias la='ls -A'
+alias ll='ls -alF'
+alias ls='ls --color=auto'
+alias fc='find . -mindepth 1 -type d | wc -l'
+alias fct='find . -mindepth 1 -maxdepth 1 -type d | wc -l'
+alias listen='sudo netstat -tulpn | grep LISTEN'
+alias stail='tail -f /var/log/syslog'
+
+# Docker
+alias dcls='docker container ls'
+alias dclsa='docker container ls -a'
+alias dvls='docker volume ls'
+alias dnls='docker network ls'
+alias dils='docker image ls'
+alias dilsa='docker image ls -a'
+alias dsp='docker system prune -a'
+alias dvp='docker volume prune -a'
+alias de='docker exec -it'
+alias dl='docker logs'
+alias dck='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
+
+# Git: Sync & Inspect
+alias gsync='git fetch origin --prune && git branch -vv'
+alias gst='git status -sb'
+alias glog='git log --oneline --graph --decorate --all'
+alias gbr='git branch -vv'
+
+# Git: Branch Cleanup
+alias gclean='git branch -vv | grep ": gone]" | awk "{print \$1}" | xargs git branch -D'
+
+# Git: Worktree
+alias wtl='git worktree list'
+alias wtp='git worktree prune'
