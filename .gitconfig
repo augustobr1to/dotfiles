@@ -1,0 +1,25 @@
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[user]
+	name = Augusto Brito
+	email = augusto@coody.app
+	signingKey = 94B3F85EF8F0A0225CDF971BCD1F8398A3F41D69
+[gpg]
+	format = openpgp
+	program = gpg
+[commit]
+	gpgsign = true
+[gpg "ssh"]
+	program = ssh-keygen
+[tag]
+	gpgsign = true
+	forceSignAnnotated = true
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
