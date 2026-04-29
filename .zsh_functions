@@ -43,3 +43,22 @@ function wtrm() {
   git branch -D "$2" && \
   echo "✅ Worktree and branch '$2' removed."
 }
+
+# VSCode: Export installed extensions as install script
+function vscode-export-extensions() {
+  code --list-extensions | sed -e 's/^/code --install-extension /' > extensions.sh
+  echo "✅ Saved to extensions.sh"
+}
+
+# GitHub: Clone all repos from an org
+# Usage: gh-clone-org <orgname>
+function gh-clone-org() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: gh-clone-org <orgname>"
+    return 1
+  fi
+  gh repo list "$1" --limit 1000 | while read -r repo _; do
+    gh repo clone "$repo" "$repo"
+  done
+}
+
