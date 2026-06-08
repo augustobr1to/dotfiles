@@ -34,3 +34,8 @@ alias gclean='git branch -vv | grep ": gone]" | awk "{print \$1}" | xargs git br
 # Git: Worktree
 alias wtl='git worktree list'
 alias wtp='git worktree prune'
+
+# Claude CLI: multiple accounts
+alias claude='CLAUDE_CONFIG_DIR=~/.claude /opt/homebrew/bin/claude'
+alias claudesp='CLAUDE_CONFIG_DIR=~/.claude-sp /opt/homebrew/bin/claude'
+alias claudesc='CLAUDE_CONFIG_DIR=~/.claude-sc /opt/homebrew/bin/claude'

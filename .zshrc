@@ -27,7 +27,7 @@ eval "$(mise activate zsh)"
 eval "$(starship init zsh)"
 
 # Ports
-DEV_PORTS=(5173 5174 3333 3000)
+DEV_PORTS=(4984 8080 8787 5172 5173 5174 5175 3333 3000)
 
 # Git: Sync & Inspect
 alias gsync='git fetch origin --prune && git branch -vv'
@@ -36,8 +36,26 @@ alias glog='git log --oneline --graph --decorate --all'
 alias gbr='git branch -vv'
 
 # Git: Branch Cleanup
-alias gclean='git branch -vv | grep ": gone]" | awk "{print \$1}" | xargs git branch -D'
+alias gclean='git branch -vv | grep ": gone]" | awk "{print $1}" | xargs git branch -D'
 
 # Git: Worktree
 alias wtl='git worktree list'
 alias wtp='git worktree prune'
+
+. "/Users/augustobrito/.acme.sh/acme.sh.env"
+
+# opencode
+export PATH=/Users/augustobrito/.opencode/bin:$PATH
+
+# Claude Code - Native Installer
+export PATH="$HOME/.local/bin:$PATH"
+
+# Claude Code - Múltiplas Contas
+# Conta 1: coody.app (padrão - usa ~/.claude)
+alias claude='claude'
+
+# Conta 2: solarprime.com.br (usa ~/.claude-sp)
+alias claudesp='CLAUDE_CONFIG_DIR=~/.claude-sp claude'
+
+# Conta 3: spaceclass.com.br (usa ~/.claude-sc)
+alias claudesc='CLAUDE_CONFIG_DIR=~/.claude-sc claude'
