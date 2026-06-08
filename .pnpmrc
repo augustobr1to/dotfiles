@@ -1,0 +1,15 @@
+# Quarantine new packages for 7 days before installing (value in minutes)
+minimumReleaseAge=10080
+
+# Block subdependencies from exotic sources (git URLs, tarballs)
+blockExoticSubdeps=true
+
+# Only allow explicitly trusted packages to run build scripts
+# (pnpm v10+ disables all by default, so this is a whitelist)
+allowBuilds=esbuild,sharp,postcss,typescript
+
+# Prevent downgrades in trust level (e.g., from provenanced → unsigned)
+trustPolicy=no-downgrade
+
+# Always use lockfile
+lockfile=true

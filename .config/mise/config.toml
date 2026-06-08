@@ -1,0 +1,24 @@
+[settings]
+# Block newly published tool versions (7 days minimum)
+minimum_release_age = "7d"
+
+# Verify SLSA provenance for all backends that support it
+slsa = true
+
+# Verify GitHub Artifact Attestations
+github_attestations = true
+
+# Treat provenance API failures as fatal (don't skip checks)
+provenance_api_failures_fatal = true
+
+# Require lockfile for reproducible installs
+lockfile = true
+
+# Fail if lockfile is incomplete (no API calls in CI)
+locked = true
+
+# Use GPG to verify all tool signatures
+gpg_verify = true
+
+# Enable paranoid mode (extra security)
+paranoid = true
