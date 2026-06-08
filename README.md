@@ -4,14 +4,14 @@ This repository contains my personal dotfiles and configuration files for variou
 
 ## Documentation
 
-See the documentation in the `docs/` directory for contribution guidelines, installation, usage, security, and maintenance notes:
+See the repository-level documentation for contribution guidelines, installation, usage, security, and maintenance notes:
 
-- [CONTRIBUTING](docs/CONTRIBUTING.md)
-- [CODE OF CONDUCT](docs/CODE_OF_CONDUCT.md)
-- [INSTALLATION](docs/INSTALLATION.md)
-- [USAGE](docs/USAGE.md)
-- [ARCHITECTURE](docs/ARCHITECTURE.md)
-- [SECURITY](docs/SECURITY.md)
+- [CONTRIBUTING](CONTRIBUTING.md)
+- [CODE OF CONDUCT](CODE_OF_CONDUCT.md)
+- [INSTALLATION](INSTALLATION.md)
+- [USAGE](USAGE.md)
+- [ARCHITECTURE](ARCHITECTURE.md)
+- [SECURITY](SECURITY.md)
 - [SUPPLY CHAIN SECURITY](docs/SUPPLY-CHAIN-SECURITY.md)
-- [MAINTENANCE](docs/MAINTENANCE.md)
-- [FAQ](docs/FAQ.md)
+- [MAINTENANCE](MAINTENANCE.md)
+- [FAQ](FAQ.md)
