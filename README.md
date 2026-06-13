@@ -1,6 +1,6 @@
 # Dotfiles
 
-This repository contains my personal dotfiles and configuration files for various tools and applications. These files are used to customize my development environment and improve my workflow.
+A personal collection of configuration files used to customize and streamline my development environment. This repository includes settings for shell, editor, terminal, and other tools, with a focus on productivity, consistency, and portability across systems.
 
 ## Documentation
 
