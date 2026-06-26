@@ -115,6 +115,13 @@ thin, auditable wrapper rather than blind one-liners.
 | **rtk** | `brew install rtk` | Homebrew formula; pinned/auditable via the tap. The wrapper only calls the already-installed `rtk` binary (`rtk init -g`), never downloads it. |
 | **caveman** | `curl … install.sh \| bash` → `npx github:JuliusBrussee/caveman` | The upstream installer pins **all** remote fetches to an immutable release tag (currently `v1.9.0`), not the moving `main` branch, so an upstream push cannot silently change what executes. It ships a `checksums.sha256` integrity manifest for the hook files. |
 
+The same helper also installs Claude Code **marketplace plugins** (see
+[CLAUDE-TOOLING.md](CLAUDE-TOOLING.md)). Most come from the first-party
+`anthropics/claude-plugins-official` marketplace; `warp` comes from the vendor
+marketplace `warpdotdev/claude-code-warp`. Adding a marketplace and installing
+its plugins runs third-party code — review the marketplace and pin/track the
+plugin versions you depend on.
+
 Guidance:
 
 - **Review before running.** Read `bin/claude-tooling-setup` and the upstream

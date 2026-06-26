@@ -20,6 +20,7 @@ See the repository-level documentation for contribution guidelines, installation
 ## Claude Code
 
 This setup runs three Claude Code accounts, selected by the `claude`, `claudesp`,
-and `claudesc` aliases (see `.zsh_aliases`). Per-profile tooling — `rtk` and
-`caveman` — is installed into each config dir with `bin/claude-tooling-setup`.
-See [CLAUDE CODE TOOLING](docs/CLAUDE-TOOLING.md) for details.
+and `claudesc` aliases (see `.zsh_aliases`). Per-profile tooling — `rtk`,
+`caveman`, and a curated set of marketplace plugins — is installed into each
+config dir with `bin/claude-tooling-setup`. See
+[CLAUDE CODE TOOLING](docs/CLAUDE-TOOLING.md) for the plugin list and details.

@@ -9,7 +9,8 @@ set -euo pipefail
 #   ~/.claude-sc   → alias `claudesc`   (spaceclass.com.br)
 #
 # Each Claude Code config dir is a self-contained profile, so the tooling
-# (rtk hook + RTK.md, caveman plugin) has to be installed once per dir.
+# (rtk hook + RTK.md, caveman plugin, marketplace plugins) has to be installed
+# once per dir.
 #
 # What it installs, per config dir:
 #   - rtk   : `rtk init -g` (PreToolUse hook + RTK.md + @RTK.md reference +
@@ -17,8 +18,15 @@ set -euo pipefail
 #   - caveman: the upstream `install.sh` one-liner, scoped via CLAUDE_CONFIG_DIR
 #             so `claude plugin install`, the hook files, and settings.json all
 #             land in that profile.
+#   - plugins: a curated set of Claude Code marketplace plugins (see PLUGINS),
+#             after ensuring the needed marketplaces are configured.
 #
-# Both installers are idempotent — re-running is safe and only fills in gaps.
+# Not installed here: claude-in-chrome and computer-use are built-in Claude
+# Code features (enable via `claude --chrome` / `/chrome`), not marketplace
+# plugins; "excalidraw" has no official marketplace plugin. They are documented
+# in docs/CLAUDE-TOOLING.md rather than installed.
+#
+# All steps are idempotent — re-running is safe and only fills in gaps.
 #
 # Usage:
 #   bin/claude-tooling-setup            # install/refresh into all config dirs
@@ -28,6 +36,7 @@ set -euo pipefail
 #   - rtk    : `brew install rtk`  (Rust Token Killer; verify with `rtk gain`)
 #   - caveman: Node.js >= 18 and curl (the upstream installer pins itself to an
 #              immutable release tag — see docs/SUPPLY-CHAIN-SECURITY.md)
+#   - plugins: the `claude` CLI (Claude Code). Override its path with CLAUDE_BIN.
 
 CONFIG_DIRS=(
   "$HOME/.claude"
@@ -36,6 +45,25 @@ CONFIG_DIRS=(
 )
 
 CAVEMAN_INSTALL_URL="https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh"
+
+# Marketplaces to ensure before installing plugins, as "name=source" pairs.
+MARKETPLACES=(
+  "claude-plugins-official=anthropics/claude-plugins-official"
+  "claude-code-warp=warpdotdev/claude-code-warp"
+)
+
+# Plugins to install, as "plugin@marketplace".
+PLUGINS=(
+  "github@claude-plugins-official"
+  "claude-md-management@claude-plugins-official"
+  "code-simplifier@claude-plugins-official"
+  "security-guidance@claude-plugins-official"
+  "remember@claude-plugins-official"
+  "superpowers@claude-plugins-official"
+  "skill-creator@claude-plugins-official"
+  "ralph-loop@claude-plugins-official"
+  "warp@claude-code-warp"
+)
 
 DRY_RUN=0
 if [[ "${1:-}" == "--dry-run" ]] || [[ "${1:-}" == "-n" ]]; then
@@ -47,11 +75,29 @@ have() { command -v "$1" >/dev/null 2>&1; }
 # ── Prerequisite checks ──────────────────────────────────────────────────────
 HAVE_RTK=1
 HAVE_CAVEMAN=1
+HAVE_CLAUDE=1
 
 if ! have rtk; then
   echo "WARN: rtk not found on PATH. Install with: brew install rtk" >&2
   echo "      Skipping rtk steps." >&2
   HAVE_RTK=0
+fi
+
+# Resolve the claude CLI. PATH may not include ~/.local/bin in a non-login
+# shell, and `claude` is often only a shell alias — fall back to the native
+# installer location.
+CLAUDE_BIN="${CLAUDE_BIN:-}"
+if [[ -z "$CLAUDE_BIN" ]]; then
+  if have claude; then
+    CLAUDE_BIN="$(command -v claude)"
+  elif [[ -x "$HOME/.local/bin/claude" ]]; then
+    CLAUDE_BIN="$HOME/.local/bin/claude"
+  fi
+fi
+if [[ -z "$CLAUDE_BIN" || ! -x "$CLAUDE_BIN" ]]; then
+  echo "WARN: claude CLI not found. Set CLAUDE_BIN=/path/to/claude to enable" >&2
+  echo "      plugin installs. Skipping plugin steps." >&2
+  HAVE_CLAUDE=0
 fi
 
 if ! have curl; then
@@ -87,6 +133,28 @@ install_caveman() {
   curl -fsSL "$CAVEMAN_INSTALL_URL" | CLAUDE_CONFIG_DIR="$dir" bash -s -- --non-interactive
 }
 
+install_plugins() {
+  local dir="$1" mp name src plugin
+  # Ensure marketplaces (idempotent; a second add is a harmless no-op/error).
+  for mp in "${MARKETPLACES[@]}"; do
+    name="${mp%%=*}"; src="${mp#*=}"
+    if [[ $DRY_RUN -eq 1 ]]; then
+      echo "[dry-run] CLAUDE_CONFIG_DIR=$dir $CLAUDE_BIN plugin marketplace add $src   # $name"
+    else
+      CLAUDE_CONFIG_DIR="$dir" "$CLAUDE_BIN" plugin marketplace add "$src" >/dev/null 2>&1 || true
+    fi
+  done
+  for plugin in "${PLUGINS[@]}"; do
+    if [[ $DRY_RUN -eq 1 ]]; then
+      echo "[dry-run] CLAUDE_CONFIG_DIR=$dir $CLAUDE_BIN plugin install $plugin"
+    elif CLAUDE_CONFIG_DIR="$dir" "$CLAUDE_BIN" plugin install "$plugin" >/dev/null 2>&1; then
+      echo "    [ok]   $plugin"
+    else
+      echo "    [skip] $plugin (already installed or unavailable)"
+    fi
+  done
+}
+
 # ── Run ──────────────────────────────────────────────────────────────────────
 echo "Claude Code tooling setup (rtk + caveman)"
 [[ $DRY_RUN -eq 1 ]] && echo "Dry-run mode: no changes will be made."
@@ -108,9 +176,15 @@ for dir in "${CONFIG_DIRS[@]}"; do
     echo "  → caveman"
     install_caveman "$dir"
   fi
+
+  if [[ $HAVE_CLAUDE -eq 1 ]]; then
+    echo "  → plugins"
+    install_plugins "$dir"
+  fi
 done
 
 echo
 echo "Done. Restart any running Claude Code sessions to pick up the hooks."
 echo "Verify rtk:     RTK_CLAUDE_DIR=~/.claude rtk init -g --show"
 echo "Verify caveman: start a session and run /caveman (or say 'caveman mode')."
+echo "Verify plugins: CLAUDE_CONFIG_DIR=~/.claude claude plugin list"
