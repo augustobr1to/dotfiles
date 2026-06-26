@@ -11,7 +11,15 @@ See the repository-level documentation for contribution guidelines, installation
 - [INSTALLATION](INSTALLATION.md)
 - [USAGE](USAGE.md)
 - [ARCHITECTURE](ARCHITECTURE.md)
+- [CLAUDE CODE TOOLING (rtk + caveman)](docs/CLAUDE-TOOLING.md)
 - [SECURITY](SECURITY.md)
 - [SUPPLY CHAIN SECURITY](docs/SUPPLY-CHAIN-SECURITY.md)
 - [MAINTENANCE](MAINTENANCE.md)
 - [FAQ](FAQ.md)
+
+## Claude Code
+
+This setup runs three Claude Code accounts, selected by the `claude`, `claudesp`,
+and `claudesc` aliases (see `.zsh_aliases`). Per-profile tooling — `rtk` and
+`caveman` — is installed into each config dir with `bin/claude-tooling-setup`.
+See [CLAUDE CODE TOOLING](docs/CLAUDE-TOOLING.md) for details.

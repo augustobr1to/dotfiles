@@ -23,3 +23,21 @@ ln -s $PWD/.config/nvim ~/.config/nvim
 ```
 
 Always review scripts before running them.
+
+## Claude Code tooling (rtk + caveman)
+
+The dotfiles drive three Claude Code accounts via the `claude` / `claudesp` /
+`claudesc` aliases (`~/.claude`, `~/.claude-sp`, `~/.claude-sc`). The `rtk` hook
+and the `caveman` plugin must be installed into each config dir. Use the bundled
+helper (idempotent):
+
+```bash
+bin/claude-tooling-setup            # install into all three config dirs
+bin/claude-tooling-setup --dry-run  # preview only
+
+# or fold it into the dotfiles install:
+./install.sh --with-claude-tooling
+```
+
+Prerequisites: `brew install rtk`, plus Node.js >= 18 and `curl` for caveman.
+See [CLAUDE-TOOLING.md](CLAUDE-TOOLING.md) for the full breakdown.

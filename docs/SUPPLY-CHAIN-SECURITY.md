@@ -103,3 +103,24 @@ engine-strict=true
 | **Exotic-source blocking** | ❌ | ✅ `blockExoticSubdeps` | ❌ |
 | **Provenance verification** | ✅ SLSA + GitHub attestations | ⚠️ Partial | ⚠️ Partial |
 | **Lockfile enforcement** | ✅ `locked` | ✅ `lockfile` | ✅ `package-lock` |
+
+## Claude Code tooling installers (rtk + caveman)
+
+`bin/claude-tooling-setup` installs two external tools into each Claude Code
+config dir (see [CLAUDE-TOOLING.md](CLAUDE-TOOLING.md)). Both are run through a
+thin, auditable wrapper rather than blind one-liners.
+
+| Tool | Install path | Supply-chain notes |
+|------|--------------|--------------------|
+| **rtk** | `brew install rtk` | Homebrew formula; pinned/auditable via the tap. The wrapper only calls the already-installed `rtk` binary (`rtk init -g`), never downloads it. |
+| **caveman** | `curl … install.sh \| bash` → `npx github:JuliusBrussee/caveman` | The upstream installer pins **all** remote fetches to an immutable release tag (currently `v1.9.0`), not the moving `main` branch, so an upstream push cannot silently change what executes. It ships a `checksums.sha256` integrity manifest for the hook files. |
+
+Guidance:
+
+- **Review before running.** Read `bin/claude-tooling-setup` and the upstream
+  `install.sh` (and bump-pinned tag) before each run; use `--dry-run` to see the
+  exact commands first.
+- **Pin awareness.** Caveman's pinned ref can be overridden with `CAVEMAN_REF`
+  for testing — leave it unset in normal use so you get the vetted release tag.
+- **Scope.** The installs only touch `~/.claude*` config dirs (hooks, plugin,
+  `settings.json`); they do not modify package manifests or lockfiles.

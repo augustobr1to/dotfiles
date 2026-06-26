@@ -8,9 +8,15 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d%H%M%S)"
 
 DRY_RUN=0
-if [[ "${1:-}" == "--dry-run" ]] || [[ "${1:-}" == "-n" ]]; then
-  DRY_RUN=1
-fi
+WITH_CLAUDE_TOOLING=0
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run|-n) DRY_RUN=1 ;;
+    # Also install rtk + caveman into every Claude Code config dir after
+    # symlinking (see bin/claude-tooling-setup and docs/CLAUDE-TOOLING.md).
+    --with-claude-tooling) WITH_CLAUDE_TOOLING=1 ;;
+  esac
+done
 
 echo "Installing dotfiles from $REPO_ROOT"
 
@@ -52,3 +58,15 @@ for name in "${TARGETS[@]}"; do
 done
 
 echo "Installation complete. Backups (if any) are in $BACKUP_DIR"
+
+# Claude Code tooling (rtk + caveman) is a separate, opt-in step because it
+# writes into the live ~/.claude* config dirs rather than just symlinking.
+if [[ $WITH_CLAUDE_TOOLING -eq 1 ]]; then
+  echo
+  echo "Running Claude Code tooling setup..."
+  "$REPO_ROOT/bin/claude-tooling-setup"
+else
+  echo
+  echo "To also install rtk + caveman into your Claude Code config dirs, run:"
+  echo "  ./install.sh --with-claude-tooling   (or: bin/claude-tooling-setup)"
+fi

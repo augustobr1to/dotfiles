@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# claude-tooling-setup — install rtk + caveman across every Claude Code config dir.
+#
+# This mirrors the multi-account layout declared in .zsh_aliases:
+#
+#   ~/.claude      → alias `claude`     (coody.app)
+#   ~/.claude-sp   → alias `claudesp`   (solarprime.com.br)
+#   ~/.claude-sc   → alias `claudesc`   (spaceclass.com.br)
+#
+# Each Claude Code config dir is a self-contained profile, so the tooling
+# (rtk hook + RTK.md, caveman plugin) has to be installed once per dir.
+#
+# What it installs, per config dir:
+#   - rtk   : `rtk init -g` (PreToolUse hook + RTK.md + @RTK.md reference +
+#             settings.json patch). Targeted via RTK_CLAUDE_DIR.
+#   - caveman: the upstream `install.sh` one-liner, scoped via CLAUDE_CONFIG_DIR
+#             so `claude plugin install`, the hook files, and settings.json all
+#             land in that profile.
+#
+# Both installers are idempotent — re-running is safe and only fills in gaps.
+#
+# Usage:
+#   bin/claude-tooling-setup            # install/refresh into all config dirs
+#   bin/claude-tooling-setup --dry-run  # print what would run, change nothing
+#
+# Prerequisites (the script checks and tells you what's missing):
+#   - rtk    : `brew install rtk`  (Rust Token Killer; verify with `rtk gain`)
+#   - caveman: Node.js >= 18 and curl (the upstream installer pins itself to an
+#              immutable release tag — see docs/SUPPLY-CHAIN-SECURITY.md)
+
+CONFIG_DIRS=(
+  "$HOME/.claude"
+  "$HOME/.claude-sp"
+  "$HOME/.claude-sc"
+)
+
+CAVEMAN_INSTALL_URL="https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh"
+
+DRY_RUN=0
+if [[ "${1:-}" == "--dry-run" ]] || [[ "${1:-}" == "-n" ]]; then
+  DRY_RUN=1
+fi
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# ── Prerequisite checks ──────────────────────────────────────────────────────
+HAVE_RTK=1
+HAVE_CAVEMAN=1
+
+if ! have rtk; then
+  echo "WARN: rtk not found on PATH. Install with: brew install rtk" >&2
+  echo "      Skipping rtk steps." >&2
+  HAVE_RTK=0
+fi
+
+if ! have curl; then
+  echo "WARN: curl not found. Skipping caveman steps." >&2
+  HAVE_CAVEMAN=0
+elif ! have node; then
+  echo "WARN: node not found (caveman needs Node.js >= 18). Skipping caveman steps." >&2
+  HAVE_CAVEMAN=0
+else
+  NODE_MAJOR="$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)"
+  if [[ "$NODE_MAJOR" -lt 18 ]]; then
+    echo "WARN: Node $NODE_MAJOR is too old (caveman needs >= 18). Skipping caveman steps." >&2
+    HAVE_CAVEMAN=0
+  fi
+fi
+
+# ── Installers ───────────────────────────────────────────────────────────────
+install_rtk() {
+  local dir="$1"
+  if [[ $DRY_RUN -eq 1 ]]; then
+    echo "[dry-run] RTK_CLAUDE_DIR=$dir rtk init -g --auto-patch"
+    return
+  fi
+  RTK_CLAUDE_DIR="$dir" rtk init -g --auto-patch
+}
+
+install_caveman() {
+  local dir="$1"
+  if [[ $DRY_RUN -eq 1 ]]; then
+    echo "[dry-run] curl -fsSL $CAVEMAN_INSTALL_URL | CLAUDE_CONFIG_DIR=$dir bash -s -- --non-interactive"
+    return
+  fi
+  curl -fsSL "$CAVEMAN_INSTALL_URL" | CLAUDE_CONFIG_DIR="$dir" bash -s -- --non-interactive
+}
+
+# ── Run ──────────────────────────────────────────────────────────────────────
+echo "Claude Code tooling setup (rtk + caveman)"
+[[ $DRY_RUN -eq 1 ]] && echo "Dry-run mode: no changes will be made."
+
+for dir in "${CONFIG_DIRS[@]}"; do
+  echo
+  echo "===== $dir ====="
+  if [[ ! -d "$dir" ]]; then
+    echo "  Config dir does not exist yet; creating it."
+    [[ $DRY_RUN -eq 0 ]] && mkdir -p "$dir"
+  fi
+
+  if [[ $HAVE_RTK -eq 1 ]]; then
+    echo "  → rtk"
+    install_rtk "$dir"
+  fi
+
+  if [[ $HAVE_CAVEMAN -eq 1 ]]; then
+    echo "  → caveman"
+    install_caveman "$dir"
+  fi
+done
+
+echo
+echo "Done. Restart any running Claude Code sessions to pick up the hooks."
+echo "Verify rtk:     RTK_CLAUDE_DIR=~/.claude rtk init -g --show"
+echo "Verify caveman: start a session and run /caveman (or say 'caveman mode')."
