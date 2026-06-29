@@ -8,14 +8,14 @@ See the repository-level documentation for contribution guidelines, installation
 
 - [CONTRIBUTING](CONTRIBUTING.md)
 - [CODE OF CONDUCT](CODE_OF_CONDUCT.md)
-- [INSTALLATION](INSTALLATION.md)
-- [USAGE](USAGE.md)
-- [ARCHITECTURE](ARCHITECTURE.md)
+- [INSTALLATION](docs/INSTALLATION.md)
+- [USAGE](docs/USAGE.md)
+- [ARCHITECTURE](docs/ARCHITECTURE.md)
 - [CLAUDE CODE TOOLING (rtk + caveman)](docs/CLAUDE-TOOLING.md)
-- [SECURITY](SECURITY.md)
+- [SECURITY](docs/SECURITY.md)
 - [SUPPLY CHAIN SECURITY](docs/SUPPLY-CHAIN-SECURITY.md)
-- [MAINTENANCE](MAINTENANCE.md)
-- [FAQ](FAQ.md)
+- [MAINTENANCE](docs/MAINTENANCE.md)
+- [FAQ](docs/FAQ.md)
 
 ## Claude Code
 

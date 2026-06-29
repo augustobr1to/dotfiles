@@ -83,7 +83,8 @@ for name in "${TARGETS[@]}"; do
     # symlink into this repo. Keep ~/.config a real directory and link only the
     # immediate children this repo provides.
     mkdir -p "$dest"
-    for sub in "$src"/*; do
+    # Include hidden children (.config/.foo) as well as regular ones.
+    for sub in "$src"/* "$src"/.[!.]*; do
       [ -e "$sub" ] || continue   # no glob match -> nothing to link
       subname="$(basename "$sub")"
       link_into "$sub" "$dest/$subname" ".config/$subname"
