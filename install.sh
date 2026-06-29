@@ -61,17 +61,37 @@ fi
 
 mkdir -p "$BACKUP_DIR"
 
+# Symlink $src -> $dest, backing up anything already at $dest. The backup keeps
+# the path relative to $HOME so entries with the same basename can't collide.
+link_into() {
+  local src="$1" dest="$2" rel="$3"
+  if [ -e "$dest" ] || [ -L "$dest" ]; then
+    echo "Backing up existing $dest -> $BACKUP_DIR/$rel"
+    mkdir -p "$BACKUP_DIR/$(dirname "$rel")"
+    mv "$dest" "$BACKUP_DIR/$rel"
+  fi
+  echo "Linking $src -> $dest"
+  ln -s "$src" "$dest"
+}
+
 for name in "${TARGETS[@]}"; do
   src="$REPO_ROOT/$name"
   dest="$HOME/$name"
 
-  if [ -e "$dest" ] || [ -L "$dest" ]; then
-    echo "Backing up existing $dest -> $BACKUP_DIR/"
-    mv "$dest" "$BACKUP_DIR/"
+  if [[ "$name" == ".config" ]]; then
+    # ~/.config is shared by many tools — never replace the whole dir with a
+    # symlink into this repo. Keep ~/.config a real directory and link only the
+    # immediate children this repo provides.
+    mkdir -p "$dest"
+    for sub in "$src"/*; do
+      [ -e "$sub" ] || continue   # no glob match -> nothing to link
+      subname="$(basename "$sub")"
+      link_into "$sub" "$dest/$subname" ".config/$subname"
+    done
+    continue
   fi
 
-  echo "Linking $src -> $dest"
-  ln -s "$src" "$dest"
+  link_into "$src" "$dest" "$name"
 done
 
 echo "Installation complete. Backups (if any) are in $BACKUP_DIR"

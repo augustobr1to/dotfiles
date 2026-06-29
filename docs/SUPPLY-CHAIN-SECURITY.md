@@ -44,28 +44,37 @@ pnpm is the **only** package manager covering all three major supply chain defen
 
 ### Settings Location
 
-- Global: `~/.pnpmrc`
-- Local: `.pnpmrc`
+As of pnpm v11, **only auth and registry settings are read from `.npmrc`**. There
+is no `.pnpmrc` — pnpm never reads such a file. All other settings, including the
+supply-chain controls below, must live in:
+
+- Global (user): `~/.config/pnpm/config.yaml` ← this repo ships it as `.config/pnpm/config.yaml`
+- Local (project): `pnpm-workspace.yaml`
+
+The format is YAML (not the `ini`/`key=value` form an rc file uses).
 
 ### Recommended Security Settings
 
-```ini
-minimumReleaseAge=10080
-blockExoticSubdeps=true
-allowBuilds=esbuild,sharp,postcss,typescript
-trustPolicy=no-downgrade
-lockfile=true
+```yaml
+# ~/.config/pnpm/config.yaml
+minimumReleaseAge: 10080
+blockExoticSubdeps: true
+allowBuilds:
+  esbuild: true
+  sharp: true
+  postcss: true
+  typescript: true
+trustPolicy: no-downgrade
 ```
 
 ### Key Settings Explained
 
 | Setting | Purpose | Default |
 |---------|---------|---------|
-| **`minimumReleaseAge=10080`** | Blocks packages published <7 days ago (10080 minutes). | `1440` in v11 (1 day) |
-| **`blockExoticSubdeps=true`** | Prevents transitive deps from git repos/tarballs. | `false` |
-| **`allowBuilds=esbuild,sharp,...`** | Whitelist packages allowed to run build scripts. | Disables all by default in v10+ |
-| **`trustPolicy=no-downgrade`** | Blocks installation if trust level decreases. | `no-downgrade` |
-| **`lockfile=true`** | Commits exact versions. | `true` |
+| **`minimumReleaseAge: 10080`** | Blocks packages published <7 days ago (10080 minutes). | `1440` in v11 (1 day) |
+| **`blockExoticSubdeps: true`** | Prevents transitive deps from git repos/tarballs. | `true` in v11 |
+| **`allowBuilds: {…}`** | Map of packages allowed to run build scripts. | Disables all by default in v10+ |
+| **`trustPolicy: no-downgrade`** | Blocks installation if trust level decreases. | unset |
 
 ## npm
 

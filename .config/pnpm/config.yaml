@@ -1,0 +1,26 @@
+# pnpm global (user-level) configuration.
+#
+# pnpm reads this from ~/.config/pnpm/config.yaml. In pnpm v11 ONLY auth and
+# registry settings are honored from .npmrc — every other setting (including
+# all of the supply-chain hardening below) MUST live here or in a project's
+# pnpm-workspace.yaml. A `.pnpmrc` file is not read by pnpm at all, so these
+# keys previously had no effect.
+
+# Quarantine newly published versions for 7 days before they can be installed
+# (value in minutes). Applies to transitive deps too.
+minimumReleaseAge: 10080
+
+# Block subdependencies from exotic sources (git URLs, tarballs).
+blockExoticSubdeps: true
+
+# Only these packages may run build (install) scripts. pnpm v10+ blocks all by
+# default; this is the explicit allowlist. Map of package -> allowed.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  postcss: true
+  typescript: true
+
+# Refuse to install a package whose trust level dropped vs a previous release
+# (e.g. provenanced -> unsigned).
+trustPolicy: no-downgrade
