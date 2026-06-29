@@ -9,19 +9,6 @@ alias fct='find . -mindepth 1 -maxdepth 1 -type d | wc -l'
 alias listen='sudo netstat -tulpn | grep LISTEN'
 alias stail='tail -f /var/log/syslog'
 
-# Docker
-alias dcls='docker container ls'
-alias dclsa='docker container ls -a'
-alias dvls='docker volume ls'
-alias dnls='docker network ls'
-alias dils='docker image ls'
-alias dilsa='docker image ls -a'
-alias dsp='docker system prune -a'
-alias dvp='docker volume prune -a'
-alias de='docker exec -it'
-alias dl='docker logs'
-alias dck='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
-
 # Git: Sync & Inspect
 alias gsync='git fetch origin --prune && git branch -vv'
 alias gst='git status -sb'
