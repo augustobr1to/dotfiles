@@ -1,0 +1,8 @@
+# Claude Code session history — not part of the dotfiles
+.remember/
+
+# Installer backups
+dotfiles_backup_*/
+
+# OS noise
+.DS_Store

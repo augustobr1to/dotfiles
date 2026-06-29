@@ -4,7 +4,7 @@
 # Aliases
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
 
-. "$HOME/.local/bin/env"
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
 # Resend CLI
 export PATH="$HOME/.resend/bin:$PATH"
@@ -20,7 +20,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 eval "$(mise activate zsh)"
 
 # Vite+ — bundling/build tooling only, NOT node shims
-. "$HOME/.vite-plus/env"
+[[ -f "$HOME/.vite-plus/env" ]] && . "$HOME/.vite-plus/env"
 # NOTE: Do NOT add .vite-plus/shims to PATH — that would override mise's Node
 
 # Starship
@@ -29,20 +29,10 @@ eval "$(starship init zsh)"
 # Ports
 DEV_PORTS=(4984 8080 8787 5172 5173 5174 5175 3333 3000)
 
-# Git: Sync & Inspect
-alias gsync='git fetch origin --prune && git branch -vv'
-alias gst='git status -sb'
-alias glog='git log --oneline --graph --decorate --all'
-alias gbr='git branch -vv'
+# Git aliases (gsync/gst/glog/gbr/gclean/wtl/wtp) live in ~/.zsh_aliases —
+# single source of truth, sourced above. Do not redefine them here.
 
-# Git: Branch Cleanup
-alias gclean='git branch -vv | grep ": gone]" | awk "{print $1}" | xargs git branch -D'
-
-# Git: Worktree
-alias wtl='git worktree list'
-alias wtp='git worktree prune'
-
-. "/Users/augustobrito/.acme.sh/acme.sh.env"
+[[ -f "$HOME/.acme.sh/acme.sh.env" ]] && . "$HOME/.acme.sh/acme.sh.env"
 
 # opencode
 export PATH=/Users/augustobrito/.opencode/bin:$PATH
@@ -50,12 +40,5 @@ export PATH=/Users/augustobrito/.opencode/bin:$PATH
 # Claude Code - Native Installer
 export PATH="$HOME/.local/bin:$PATH"
 
-# Claude Code - Múltiplas Contas
-# Conta 1: coody.app (padrão - usa ~/.claude)
-alias claude='claude'
-
-# Conta 2: solarprime.com.br (usa ~/.claude-sp)
-alias claudesp='CLAUDE_CONFIG_DIR=~/.claude-sp claude'
-
-# Conta 3: spaceclass.com.br (usa ~/.claude-sc)
-alias claudesc='CLAUDE_CONFIG_DIR=~/.claude-sc claude'
+# Claude Code multi-account aliases (claude/claudesp/claudesc) live in
+# ~/.zsh_aliases — single source of truth, sourced above.

@@ -44,7 +44,12 @@ CONFIG_DIRS=(
   "$HOME/.claude-sc"
 )
 
-CAVEMAN_INSTALL_URL="https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh"
+# Pin the bootstrap installer to an immutable release tag, not the moving
+# `main` branch — otherwise an upstream push to main/install.sh could change
+# what executes before any internal pin applies (see docs/SUPPLY-CHAIN-SECURITY.md).
+# Override for testing with CAVEMAN_REF; leave unset in normal use.
+CAVEMAN_REF="${CAVEMAN_REF:-v1.9.0}"
+CAVEMAN_INSTALL_URL="https://raw.githubusercontent.com/JuliusBrussee/caveman/${CAVEMAN_REF}/install.sh"
 
 # Marketplaces to ensure before installing plugins, as "name=source" pairs.
 MARKETPLACES=(

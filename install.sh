@@ -21,13 +21,30 @@ done
 echo "Installing dotfiles from $REPO_ROOT"
 
 TARGETS=()
+# Names never linked into $HOME: VCS internals, the gitignore itself, repo
+# meta, and `.remember/` (Claude session history — not a home dotfile).
+SKIP=(".git" ".gitignore" ".remember")
+
+is_skipped() {
+  local n="$1" s
+  for s in "${SKIP[@]}"; do [[ "$n" == "$s" ]] && return 0; done
+  return 1
+}
+
+in_targets() {
+  local n="$1" t
+  [ ${#TARGETS[@]} -eq 0 ] && return 1
+  for t in "${TARGETS[@]}"; do [[ "$t" == "$n" ]] && return 0; done
+  return 1
+}
+
+# Note: the .[!.]* glob already matches .config, so list bin/.config explicitly
+# only to be safe; in_targets() dedups so nothing links twice.
 for path in "$REPO_ROOT"/.[!.]* "$REPO_ROOT"/bin "$REPO_ROOT"/.config; do
   [ -e "$path" ] || continue
   name="$(basename "$path")"
-  # Skip .git and any backup files
-  if [[ "$name" == ".git" ]] || [[ "$name" == ".gitignore" ]]; then
-    continue
-  fi
+  is_skipped "$name" && continue
+  in_targets "$name" && continue
   TARGETS+=("$name")
 done
 
